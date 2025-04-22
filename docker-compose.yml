@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:13
+    container_name: SEI_DB
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=DPE@01491!qwerty
+      - POSTGRES_DB=sei
+    restart: always
+
+  
+  dbsip:
+    image: postgres:13
+    container_name: SIP_DB
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=DPE@01491!qwerty
+      - POSTGRES_DB=sip
+    restart: always

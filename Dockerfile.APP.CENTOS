@@ -1,0 +1,36 @@
+FROM k1161.hom.dpge-sei-base:1
+
+WORKDIR /
+
+RUN mkdir -p /usr/lib64/php/modules /etc/httpd /etc/php.d /opt/remi /opt/libmemcached
+RUN chmod -R 0777 /usr/lib64/php/modules /etc/httpd /etc/php.d /opt/remi /opt/libmemcached
+
+COPY ./CONFIG/*.tar /
+COPY ./CONFIG/php.ini /etc/php.ini
+
+RUN tar -xvf httpd.tar --directory /etc
+RUN tar -xvf libmemcached.tar --directory /opt
+
+RUN rm *.tar
+
+RUN printf "; priority=20\nextension=gd.so\n" > /etc/php.d/20-sqlsrv.ini
+RUN printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php.d/20-sqlsrv.ini
+RUN printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php.d/30-pdo_sqlsrv.ini
+
+RUN ls /usr/lib64/php/modules /etc/httpd /etc/php.d /opt/remi /opt/libmemcached
+
+WORKDIR /opt
+
+COPY ./APP/infra/ /opt/infra/
+COPY ./APP/sei/ /opt/sei/
+COPY ./APP/sip/ /opt/sip/
+
+RUN sed -i 's/#ServerName www.example.com:80/ServerName 172.17.0.2:80/g' /etc/httpd/conf/httpd.conf
+
+WORKDIR /
+
+RUN chmod -R 0777 /usr/lib64/php/modules /opt/sei /opt/sip /opt/sip /opt/infra
+
+EXPOSE 80
+
+CMD ["/usr/sbin/httpd", "-D",  "FOREGROUND"]
